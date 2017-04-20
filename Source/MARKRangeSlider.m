@@ -185,6 +185,13 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 
 - (void)handleLeftPan:(UIPanGestureRecognizer *)gesture
 {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        [self sendActionsForControlEvents:UIControlEventTouchDown];
+    }
+    else if (gesture.state == UIGestureRecognizerStateEnded) {
+        [self sendActionsForControlEvents:UIControlEventTouchUpInside];
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan || gesture.state == UIGestureRecognizerStateChanged) {
         //Fix when minimumDistance = 0.0 and slider is move to 1.0-1.0
         [self bringSubviewToFront:self.leftThumbImageView];
@@ -204,6 +211,13 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 
 - (void)handleRightPan:(UIPanGestureRecognizer *)gesture
 {
+    if (gesture.state == UIGestureRecognizerStateBegan) {
+        [self sendActionsForControlEvents:UIControlEventTouchDown];
+    }
+    else if (gesture.state == UIGestureRecognizerStateEnded) {
+        [self sendActionsForControlEvents:UIControlEventTouchUpInside];
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan || gesture.state == UIGestureRecognizerStateChanged) {
         //Fix when minimumDistance = 0.0 and slider is move to 1.0-1.0
         [self bringSubviewToFront:self.rightThumbImageView];
