@@ -74,31 +74,31 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 - (void)setUpViewComponents
 {
     self.multipleTouchEnabled = YES;
-
+    
     // Init track image
     self.trackImageView = [[UIImageView alloc] initWithImage:self.trackImage];
     [self addSubview:self.trackImageView];
-
+    
     // Init range image
     self.rangeImageView = [[UIImageView alloc] initWithImage:self.rangeImage];
     [self addSubview:self.rangeImageView];
-
+    
     // Init left thumb image
     self.leftThumbImageView = [[UIImageView alloc] initWithImage:self.leftThumbImage];
     self.leftThumbImageView.userInteractionEnabled = YES;
     self.leftThumbImageView.contentMode = UIViewContentModeCenter;
     [self addSubview:self.leftThumbImageView];
-
+    
     // Add left pan recognizer
     UIPanGestureRecognizer *leftPanRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleLeftPan:)];
     [self.leftThumbImageView addGestureRecognizer:leftPanRecognizer];
-
+    
     // Init right thumb image
     self.rightThumbImageView = [[UIImageView alloc] initWithImage:self.rightThumbImage];
     self.rightThumbImageView.userInteractionEnabled = YES;
     self.rightThumbImageView.contentMode = UIViewContentModeCenter;
     [self addSubview:self.rightThumbImageView];
-
+    
     // Add right pan recognizer
     UIPanGestureRecognizer *rightPanRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleRightPan:)];
     [self.rightThumbImageView addGestureRecognizer:rightPanRecognizer];
@@ -109,7 +109,7 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 - (CGSize)intrinsicContentSize {
     CGFloat width = _trackImage.size.width + _leftThumbImage.size.width + _rightThumbImage.size.width;
     CGFloat height = MAX(_leftThumbImage.size.height, _rightThumbImage.size.height);
-
+    
     return CGSizeMake(width, height);
 }
 
@@ -118,37 +118,37 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     // Calculate coords & sizes
     CGFloat width = CGRectGetWidth(self.frame);
     CGFloat height = CGRectGetHeight(self.frame);
-
+    
     CGFloat trackHeight = _trackImage.size.height;
-
+    
     CGSize leftThumbImageSize = self.leftThumbImageView.image.size;
     CGSize rightThumbImageSize = self.rightThumbImageView.image.size;
-
+    
     CGFloat leftAvailableWidth = width - leftThumbImageSize.width;
     CGFloat rightAvailableWidth = width - rightThumbImageSize.width;
     if (self.disableOverlapping) {
         leftAvailableWidth -= leftThumbImageSize.width;
         rightAvailableWidth -= rightThumbImageSize.width;
     }
-
+    
     CGFloat leftInset = leftThumbImageSize.width / 2;
     CGFloat rightInset = rightThumbImageSize.width / 2;
-
+    
     CGFloat trackRange = self.maximumValue - self.minimumValue;
-
+    
     CGFloat leftX = floorf((self.leftValue - self.minimumValue) / trackRange * leftAvailableWidth);
     if (isnan(leftX)) {
         leftX = 0.0;
     }
-
+    
     CGFloat rightX = floorf((self.rightValue - self.minimumValue) / trackRange * rightAvailableWidth);
     if (isnan(rightX)) {
         rightX = 0.0;
     }
-
+    
     CGFloat trackY = (height - trackHeight) / 2;
     CGFloat gap = 1.0;
-
+    
     // Set track frame
     CGFloat trackX = gap;
     CGFloat trackWidth = width - gap * 2;
@@ -157,20 +157,20 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
         trackWidth -= leftInset + rightInset;
     }
     self.trackImageView.frame = CGRectMake(trackX, trackY, trackWidth, trackHeight);
-
+    
     // Set range frame
     CGFloat rangeWidth = rightX - leftX;
     if (self.disableOverlapping) {
         rangeWidth += rightInset + gap;
     }
     self.rangeImageView.frame = CGRectMake(leftX + leftInset, trackY, rangeWidth, trackHeight);
-
+    
     // Set thumb image view frame sizes
     CGRect leftImageViewFrame = { CGPointMake(0, 0), leftThumbImageSize };
     CGRect rightImageViewFrame = { CGPointMake(0, 0), rightThumbImageSize };
     self.leftThumbImageView.frame = leftImageViewFrame;
     self.rightThumbImageView.frame = rightImageViewFrame;
-
+    
     // Set left & right thumb frames
     leftX += leftInset;
     rightX += rightInset;
@@ -186,25 +186,25 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 - (void)handleLeftPan:(UIPanGestureRecognizer *)gesture
 {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        [self sendActionsForControlEvents:UIControlEventTouchDown];
+        [self sendActionsForControlEvents:UIControlEventTouchDragEnter];
     }
     else if (gesture.state == UIGestureRecognizerStateEnded) {
-        [self sendActionsForControlEvents:UIControlEventTouchUpInside];
+        [self sendActionsForControlEvents:UIControlEventTouchDragExit];
     }
     
     if (gesture.state == UIGestureRecognizerStateBegan || gesture.state == UIGestureRecognizerStateChanged) {
         //Fix when minimumDistance = 0.0 and slider is move to 1.0-1.0
         [self bringSubviewToFront:self.leftThumbImageView];
-
+        
         CGPoint translation = [gesture translationInView:self];
         CGFloat trackRange = self.maximumValue - self.minimumValue;
         CGFloat width = CGRectGetWidth(self.frame) - CGRectGetWidth(self.leftThumbImageView.frame);
-
+        
         // Change left value
         self.leftValue += translation.x / width * trackRange;
-
+        
         [gesture setTranslation:CGPointZero inView:self];
-
+        
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
@@ -212,25 +212,25 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 - (void)handleRightPan:(UIPanGestureRecognizer *)gesture
 {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        [self sendActionsForControlEvents:UIControlEventTouchDown];
+        [self sendActionsForControlEvents:UIControlEventTouchDragEnter];
     }
     else if (gesture.state == UIGestureRecognizerStateEnded) {
-        [self sendActionsForControlEvents:UIControlEventTouchUpInside];
+        [self sendActionsForControlEvents:UIControlEventTouchDragExit];
     }
     
     if (gesture.state == UIGestureRecognizerStateBegan || gesture.state == UIGestureRecognizerStateChanged) {
         //Fix when minimumDistance = 0.0 and slider is move to 1.0-1.0
         [self bringSubviewToFront:self.rightThumbImageView];
-
+        
         CGPoint translation = [gesture translationInView:self];
         CGFloat trackRange = self.maximumValue - self.minimumValue;
         CGFloat width = CGRectGetWidth(self.frame) - CGRectGetWidth(self.rightThumbImageView.frame);
-
+        
         // Change right value
         self.rightValue += translation.x / width * trackRange;
-
+        
         [gesture setTranslation:CGPointZero inView:self];
-
+        
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }
@@ -286,19 +286,19 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     if (minimumValue >= self.maximumValue) {
         minimumValue = self.maximumValue - self.minimumDistance;
     }
-
+    
     if (self.leftValue < minimumValue) {
         self.leftValue = minimumValue;
     }
-
+    
     if (self.rightValue < minimumValue) {
         self.rightValue = self.maximumValue;
     }
-
+    
     _minimumValue = minimumValue;
-
+    
     [self checkMinimumDistance];
-
+    
     [self setNeedsLayout];
 }
 
@@ -307,19 +307,19 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     if (maximumValue <= self.minimumValue) {
         maximumValue = self.minimumValue + self.minimumDistance;
     }
-
+    
     if (self.leftValue > maximumValue) {
         self.leftValue = self.minimumValue;
     }
-
+    
     if (self.rightValue > maximumValue) {
         self.rightValue = maximumValue;
     }
-
+    
     _maximumValue = maximumValue;
-
+    
     [self checkMinimumDistance];
-
+    
     [self setNeedsLayout];
 }
 
@@ -342,16 +342,16 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
             leftValue = allowedValue;
         }
     }
-
+    
     if (leftValue < self.minimumValue) {
         leftValue = self.minimumValue;
         if (self.rightValue - leftValue < self.minimumDistance) {
             self.rightValue = leftValue + self.minimumDistance;
         }
     }
-
+    
     _leftValue = leftValue;
-
+    
     [self setNeedsLayout];
 }
 
@@ -373,16 +373,16 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
             rightValue = allowedValue;
         }
     }
-
+    
     if (rightValue > self.maximumValue) {
         rightValue = self.maximumValue;
         if (rightValue - self.leftValue < self.minimumDistance) {
             self.leftValue = rightValue - self.minimumDistance;
         }
     }
-
+    
     _rightValue = rightValue;
-
+    
     [self setNeedsLayout];
 }
 
@@ -392,15 +392,15 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     if (minimumDistance > distance) {
         minimumDistance = distance;
     }
-
+    
     if (self.rightValue - self.leftValue < minimumDistance) {
         // Reset left and right values
         self.leftValue = self.minimumValue;
         self.rightValue = self.maximumValue;
     }
-
+    
     _minimumDistance = minimumDistance;
-
+    
     [self setNeedsLayout];
 }
 
@@ -451,10 +451,10 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     if ([UIScreen instancesRespondToSelector:@selector(scale)]) {
         NSInteger scale = [[UIScreen mainScreen] scale];
         NSString *scalledImagePath = [[bundle resourcePath]
-                            stringByAppendingPathComponent:[NSString stringWithFormat:@"%@@%dx.%@",
-                                                            [imageName stringByDeletingPathExtension],
-                                                            scale,
-                                                            [imageName pathExtension]]];
+                                      stringByAppendingPathComponent:[NSString stringWithFormat:@"%@@%dx.%@",
+                                                                      [imageName stringByDeletingPathExtension],
+                                                                      scale,
+                                                                      [imageName pathExtension]]];
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:scalledImagePath]) {
             return [[UIImage alloc] initWithContentsOfFile:scalledImagePath];
